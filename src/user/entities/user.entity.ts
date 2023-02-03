@@ -1,10 +1,9 @@
 import { Exclude } from 'class-transformer';
 import { randomUUID } from 'crypto';
 
-export default class User {
+export default class UserEntity {
   id: string;
   login: string;
-  // password: string;
   version: number;
   createdAt: number;
   updatedAt: number;
@@ -12,11 +11,7 @@ export default class User {
   @Exclude()
   password: string;
 
-  // constructor(partial: Partial<UserEntity>) {
-  //   Object.assign(this, partial);
-  // }
-
-  constructor(userObj: Partial<User>) {
+  constructor(userObj: Partial<UserEntity>) {
     this.id = randomUUID();
     this.login = userObj.login;
     this.password = userObj.password;
