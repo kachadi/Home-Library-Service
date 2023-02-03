@@ -10,8 +10,8 @@ export default class TrackEntity {
   constructor(trackObj) {
     this.id = randomUUID();
     this.name = trackObj.name;
-    this.artistId = null;
-    this.albumId = null;
+    this.artistId = trackObj.artistId;
+    this.albumId = trackObj.artistId;
     this.duration = trackObj.duration;
   }
 }
