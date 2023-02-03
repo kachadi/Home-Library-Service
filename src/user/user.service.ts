@@ -13,8 +13,8 @@ export class UserService {
   }
 
   findOne(id: string) {
-    const user = this.users.find((user) => user.id === id);
     isItemExists(this.users, id);
+    const user = this.users.find((user) => user.id === id);
     return user;
   }
 

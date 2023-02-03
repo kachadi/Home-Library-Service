@@ -13,8 +13,8 @@ export class TrackService {
   }
 
   findOne(id: string) {
-    const track = this.tracks.find((track) => track.id === id);
     isItemExists(this.tracks, id);
+    const track = this.tracks.find((track) => track.id === id);
     return track;
   }
 
