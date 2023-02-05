@@ -11,7 +11,7 @@ export default class TrackEntity {
     this.id = randomUUID();
     this.name = trackObj.name;
     this.artistId = trackObj.artistId;
-    this.albumId = trackObj.artistId;
+    this.albumId = trackObj.albumId;
     this.duration = trackObj.duration;
   }
 }

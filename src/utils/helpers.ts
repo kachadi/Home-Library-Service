@@ -1,10 +1,20 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import * as uuid from 'uuid';
 
-const isItemExists = (allItems: any[], itemId: string) => {
+const RESOURCES_NAMES = ['Album', 'Artist', 'Track', 'User'];
+
+const isItemExists = (
+  allItems: any[],
+  itemId: string,
+  itemBelongsTo: string,
+) => {
+  const ERR_MSG = `${itemBelongsTo} with :id ${itemId} is not found in database`;
   const item = allItems.find((item) => item.id === itemId);
-  if (!item) {
-    throw new NotFoundException(`Item with :id ${itemId} not found`);
+
+  if (!item && RESOURCES_NAMES.includes(itemBelongsTo)) {
+    throw new NotFoundException(ERR_MSG);
+  } else if (!item) {
+    throw new BadRequestException(ERR_MSG);
   }
 };
 
@@ -16,4 +26,33 @@ const isItemIdUUID = (itemId: string) => {
   }
 };
 
-export { isItemExists, isItemIdUUID };
+const isItemUUIDAndExists = (
+  allItems: any[],
+  itemId: string,
+  itemBelongsTo: string,
+) => {
+  isItemIdUUID(itemId);
+  isItemExists(allItems, itemId, itemBelongsTo);
+};
+
+const nullifyItemFromOtherCollections = (
+  otherCollections: any[],
+  key: string,
+  value: string,
+) => {
+  console.log(otherCollections);
+
+  otherCollections.find((collection) => {
+    const item = collection.find((item) => item[key] === value);
+    console.log(item);
+
+    item[key] = null;
+  });
+};
+
+export {
+  isItemExists,
+  isItemIdUUID,
+  isItemUUIDAndExists,
+  nullifyItemFromOtherCollections,
+};

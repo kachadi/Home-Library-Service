@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import UserEntity from './entities/user.entity';
 
+const USER = 'User';
+
 @Injectable()
 export class UserService {
   private users: UserEntity[] = [];
@@ -13,7 +15,7 @@ export class UserService {
   }
 
   findOne(id: string) {
-    isItemExists(this.users, id);
+    isItemExists(this.users, id, USER);
     const user = this.users.find((user) => user.id === id);
     return user;
   }
@@ -25,7 +27,7 @@ export class UserService {
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
-    isItemExists(this.users, id);
+    isItemExists(this.users, id, USER);
     const existingUser = this.users.find((user) => user.id === id);
     this.isOldPasswordValid(existingUser, updateUserDto.oldPassword);
     existingUser.password = updateUserDto.newPassword;
@@ -36,7 +38,7 @@ export class UserService {
 
   remove(id: string) {
     const existingUserId = this.users.findIndex((user) => user.id === id);
-    isItemExists(this.users, id);
+    isItemExists(this.users, id, USER);
     this.users.splice(existingUserId, 1);
   }
 
