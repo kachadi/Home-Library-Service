@@ -84,4 +84,16 @@ export class TrackService {
     isItemExists(this.tracks, id, TRACK);
     this.tracks.splice(existingTrackId, 1);
   }
+
+  getTracksById(tracksIdsArray: string[]) {
+    const tracksArray = [];
+    tracksIdsArray.forEach((trackId) => {
+      const track = this.tracks.filter((track) => track.id === trackId)[0];
+      tracksArray.push({
+        name: track.name,
+        duration: track.duration,
+      });
+    });
+    return tracksArray;
+  }
 }

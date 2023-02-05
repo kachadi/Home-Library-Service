@@ -80,4 +80,16 @@ export class AlbumService {
       id,
     );
   }
+
+  getAlbumsById(albumsIdsArray: string[]) {
+    const albumsArray = [];
+    albumsIdsArray.forEach((albumId) => {
+      const album = this.albums.filter((album) => album.id === albumId)[0];
+      albumsArray.push({
+        name: album.name,
+        year: album.year,
+      });
+    });
+    return albumsArray;
+  }
 }

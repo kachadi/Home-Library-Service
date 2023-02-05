@@ -64,4 +64,16 @@ export class ArtistService {
       id,
     );
   }
+
+  getArtistsById(artistIdsArray: string[]) {
+    const artistsArray = [];
+    artistIdsArray.forEach((artistId) => {
+      const artist = this.artists.filter((artist) => artist.id === artistId)[0];
+      artistsArray.push({
+        name: artist.name,
+        grammy: artist.grammy,
+      });
+    });
+    return artistsArray;
+  }
 }

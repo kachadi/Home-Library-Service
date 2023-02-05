@@ -1,4 +1,8 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import * as uuid from 'uuid';
 
 const RESOURCES_NAMES = ['Album', 'Artist', 'Track', 'User'];
@@ -7,12 +11,15 @@ const isItemExists = (
   allItems: any[],
   itemId: string,
   itemBelongsTo: string,
+  isFavs = false,
 ) => {
   const ERR_MSG = `${itemBelongsTo} with :id ${itemId} is not found in database`;
   const item = allItems.find((item) => item.id === itemId);
 
   if (!item && RESOURCES_NAMES.includes(itemBelongsTo)) {
     throw new NotFoundException(ERR_MSG);
+  } else if (isFavs && !item) {
+    throw new UnprocessableEntityException(ERR_MSG);
   } else if (!item) {
     throw new BadRequestException(ERR_MSG);
   }
