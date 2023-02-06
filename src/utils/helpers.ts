@@ -47,10 +47,9 @@ const nullifyItemFromOtherCollections = (
   key: string,
   value: string,
 ) => {
-  console.log(otherCollections);
-
   otherCollections.find((collection) => {
     const item = collection.find((item) => item[key] === value);
+    if (!item) return;
     item[key] = null;
   });
 };
@@ -59,13 +58,15 @@ const removeItemFromFavs = (
   collection: string[],
   id: string,
   itemBelongsTo: string,
+  isInFavs = false,
 ) => {
   const ERR_MSG = `${itemBelongsTo} with :id ${id} is not found in favourites`;
   const itemIndex = collection.findIndex((item) => item === id);
-  if (itemIndex === -1) {
+  if (itemIndex === -1 && isInFavs) {
     throw new NotFoundException(ERR_MSG);
+  } else if (itemIndex === -1) {
+    return;
   }
-
   collection.splice(itemIndex, 1);
 };
 

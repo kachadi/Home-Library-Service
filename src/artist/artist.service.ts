@@ -83,7 +83,6 @@ export class ArtistService {
     const artistsArray = [];
 
     artistIdsArray.forEach((artistId) => {
-      console.log(artistId);
       const artist = this.artists.filter((artist) => artist.id === artistId)[0];
       artistsArray.push(artist);
     });

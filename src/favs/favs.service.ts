@@ -67,14 +67,14 @@ export class FavsService {
   }
 
   removeTrackFromFavs(id: string) {
-    removeItemFromFavs(this.favs.tracks, id, ResoursesIdKeys.TRACK_ID);
+    removeItemFromFavs(this.favs.tracks, id, ResoursesIdKeys.TRACK_ID, true);
   }
 
   removeArtistFromFavs(id: string) {
-    removeItemFromFavs(this.favs.artists, id, ResoursesIdKeys.ARTIST_ID);
+    removeItemFromFavs(this.favs.artists, id, ResoursesIdKeys.ARTIST_ID, true);
   }
 
   removeAlbumFromFavs(id: string) {
-    removeItemFromFavs(this.favs.albums, id, ResoursesIdKeys.ALBUM_ID);
+    removeItemFromFavs(this.favs.albums, id, ResoursesIdKeys.ALBUM_ID, true);
   }
 }
