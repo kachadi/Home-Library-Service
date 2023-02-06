@@ -1,18 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ArtistService } from 'src/artist/artist.service';
+import { FavsService } from 'src/favs/favs.service';
 import { TrackService } from 'src/track/track.service';
+import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
 import {
   isItemExists,
   isItemUUIDAndExists,
   nullifyItemFromOtherCollections,
+  removeItemFromFavs,
 } from 'src/utils/helpers';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import AlbumEntity from './entities/album.entity';
-
-const ALBUM = 'Album';
-const ARTIST_ID_KEY = 'artistId';
-const ALBUM_ID_KEY = 'albumId';
 
 @Injectable()
 export class AlbumService {
@@ -23,6 +22,8 @@ export class AlbumService {
     private trackService: TrackService,
     @Inject(forwardRef(() => ArtistService))
     private artistService: ArtistService,
+    @Inject(forwardRef(() => FavsService))
+    private favsService: FavsService,
   ) {}
 
   findAll() {
@@ -30,7 +31,7 @@ export class AlbumService {
   }
 
   findOne(id: string) {
-    isItemExists(this.albums, id, ALBUM);
+    isItemExists(this.albums, id, ResoursesNames.ALBUM);
     const album = this.albums.find((album) => album.id === id);
     return album;
   }
@@ -42,7 +43,7 @@ export class AlbumService {
       isItemUUIDAndExists(
         this.artistService.artists,
         newAlbum.artistId,
-        ARTIST_ID_KEY,
+        ResoursesIdKeys.ARTIST_ID,
       );
     }
 
@@ -51,45 +52,56 @@ export class AlbumService {
   }
 
   update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    isItemExists(this.albums, id, ALBUM);
+    isItemExists(this.albums, id, ResoursesNames.ALBUM);
+
     const existingAlbum = this.albums.find((album) => album.id === id);
+
     for (const key in existingAlbum) {
       if (updateAlbumDto[key]) {
-        if (key === ARTIST_ID_KEY) {
+        if (key === ResoursesIdKeys.ARTIST_ID) {
           const artistId = updateAlbumDto[key];
 
           isItemUUIDAndExists(
             this.artistService.artists,
             artistId,
-            ARTIST_ID_KEY,
+            ResoursesIdKeys.ARTIST_ID,
           );
         }
         existingAlbum[key] = updateAlbumDto[key];
       }
     }
+
     return existingAlbum;
   }
 
   remove(id: string) {
     const existingAlbumId = this.albums.findIndex((album) => album.id === id);
-    isItemExists(this.albums, id, ALBUM);
+
+    isItemExists(this.albums, id, ResoursesNames.ALBUM);
+
     this.albums.splice(existingAlbumId, 1);
+
     nullifyItemFromOtherCollections(
       [this.trackService.tracks],
-      ALBUM_ID_KEY,
+      ResoursesIdKeys.ALBUM_ID,
       id,
+    );
+
+    removeItemFromFavs(
+      this.favsService.favs.albums,
+      id,
+      ResoursesIdKeys.ALBUM_ID,
     );
   }
 
   getAlbumsById(albumsIdsArray: string[]) {
     const albumsArray = [];
+
     albumsIdsArray.forEach((albumId) => {
       const album = this.albums.filter((album) => album.id === albumId)[0];
-      albumsArray.push({
-        name: album.name,
-        year: album.year,
-      });
+      albumsArray.push(album);
     });
+
     return albumsArray;
   }
 }

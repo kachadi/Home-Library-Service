@@ -1,14 +1,17 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { AlbumService } from 'src/album/album.service';
+import AlbumEntity from 'src/album/entities/album.entity';
 import { ArtistService } from 'src/artist/artist.service';
+import ArtistEntity from 'src/artist/entities/artist.entity';
+import TrackEntity from 'src/track/entities/track.entity';
 import { TrackService } from 'src/track/track.service';
-import { isItemExists } from 'src/utils/helpers';
+import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
+import {
+  isItemExists,
+  removeItemFromFavs,
+  successResponse,
+} from 'src/utils/helpers';
 import { IFavs } from './models/favs.interface';
-
-const ARTIST_ID_KEY = 'artistId';
-const ALBUM_ID_KEY = 'albumId';
-const TRACK_ID_KEY = 'trackId';
-const SUCCESS_MSG = 'Successfully added to favorites😊';
 
 @Injectable()
 export class FavsService {
@@ -28,7 +31,11 @@ export class FavsService {
   ) {}
 
   findAll() {
-    const favsResponse = {
+    const favsResponse: {
+      artists: ArtistEntity[] | undefined[];
+      albums: AlbumEntity[] | undefined[];
+      tracks: TrackEntity[] | undefined[];
+    } = {
       artists: [],
       albums: [],
       tracks: [],
@@ -42,20 +49,32 @@ export class FavsService {
   }
 
   addArtistToFavs(id: string) {
-    isItemExists(this.artistService.artists, id, ARTIST_ID_KEY, true);
+    isItemExists(this.artistService.artists, id, ResoursesNames.ARTIST, true);
     this.favs.artists.push(id);
-    return SUCCESS_MSG;
+    return successResponse(ResoursesNames.ARTIST, id);
   }
 
   addAlbumsToFavs(id: string) {
-    isItemExists(this.albumService.albums, id, ALBUM_ID_KEY, true);
+    isItemExists(this.albumService.albums, id, ResoursesNames.ALBUM, true);
     this.favs.albums.push(id);
-    return SUCCESS_MSG;
+    return successResponse(ResoursesNames.ALBUM, id);
   }
 
   addTracksToFavs(id: string) {
-    isItemExists(this.trackService.tracks, id, TRACK_ID_KEY, true);
+    isItemExists(this.trackService.tracks, id, ResoursesNames.TRACK, true);
     this.favs.tracks.push(id);
-    return SUCCESS_MSG;
+    return successResponse(ResoursesNames.TRACK, id);
+  }
+
+  removeTrackFromFavs(id: string) {
+    removeItemFromFavs(this.favs.tracks, id, ResoursesIdKeys.TRACK_ID);
+  }
+
+  removeArtistFromFavs(id: string) {
+    removeItemFromFavs(this.favs.artists, id, ResoursesIdKeys.ARTIST_ID);
+  }
+
+  removeAlbumFromFavs(id: string) {
+    removeItemFromFavs(this.favs.albums, id, ResoursesIdKeys.ALBUM_ID);
   }
 }
