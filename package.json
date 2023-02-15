@@ -6,9 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "docker": "docker-compose up",
+    "docker:test": "docker exec home-library-service-app-container npm run test",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "scan:app": "docker scan home-library-app",
+    "scan:postgres": "docker scan home-library-service-postgres-database",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
