@@ -18,28 +18,28 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - postgres-logs:/var/log/postgresql
 
-  # app:
-  #   container_name: app-container
-  #   image: app
-  #   build: .
-  #   depends_on:
-  #     - db
-  #   restart: always
-  #   ports:
-  #     - '${PORT}:${PORT}'
-  #   environment:
-  #     - PORT=${PORT}
-  #     - HOST=${HOST}
-  #     - TYPEORM_CONNECTION=${TYPEORM_CONNECTION}
-  #     - TYPEORM_USERNAME=${TYPEORM_USERNAME}
-  #     - TYPEORM_PASSWORD=${TYPEORM_PASSWORD}
-  #     - TYPEORM_DATABASE=${TYPEORM_DATABASE}
-  #     - TYPEORM_PORT=${TYPEORM_PORT}
-  #     - TYPEORM_HOST=db
-  #   networks:
-  #     - home-library-network
-  #   volumes:
-  #     - ./:/app
+  app:
+    container_name: app-container
+    image: app
+    build: .
+    depends_on:
+      - db
+    restart: always
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - PORT=${PORT}
+      - HOST=${HOST}
+      - TYPEORM_CONNECTION=${TYPEORM_CONNECTION}
+      - TYPEORM_USERNAME=${TYPEORM_USERNAME}
+      - TYPEORM_PASSWORD=${TYPEORM_PASSWORD}
+      - TYPEORM_DATABASE=${TYPEORM_DATABASE}
+      - TYPEORM_PORT=${TYPEORM_PORT}
+      - TYPEORM_HOST=db
+    networks:
+      - home-library-network
+    volumes:
+      - ./:/app
   
 volumes:
   postgres-data:

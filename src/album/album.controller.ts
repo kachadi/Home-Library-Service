@@ -29,8 +29,8 @@ export class AlbumController {
   }
 
   @Post()
-  create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumService.create(createAlbumDto);
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
+    return await this.albumService.create(createAlbumDto);
   }
 
   @Put(':uuid')
@@ -43,7 +43,7 @@ export class AlbumController {
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.albumService.remove(uuid);
+  async remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.albumService.remove(uuid);
   }
 }

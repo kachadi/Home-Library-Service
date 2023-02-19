@@ -15,40 +15,40 @@ export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 
   @Get()
-  findAll() {
-    return this.favsService.findAll();
+  async findAll() {
+    return await this.favsService.findAll();
   }
 
   @Post('artist/:uuid')
-  addArtistToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.addArtistToFavs(uuid);
+  async addArtistToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.addArtistToFavs(uuid);
   }
 
   @Post('album/:uuid')
-  addAlbumsToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.addAlbumsToFavs(uuid);
+  async addAlbumsToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.addAlbumsToFavs(uuid);
   }
 
   @Post('track/:uuid')
-  addTracksToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.addTracksToFavs(uuid);
+  async addTracksToFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.addTracksToFavs(uuid);
   }
 
   @Delete('track/:uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrackFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.removeTrackFromFavs(uuid);
+  async removeTrackFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.removeTrackFromFavs(uuid);
   }
 
   @Delete('artist/:uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeArtistFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.removeArtistFromFavs(uuid);
+  async removeArtistFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.removeArtistFromFavs(uuid);
   }
 
   @Delete('album/:uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeAlbumFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.favsService.removeAlbumFromFavs(uuid);
+  async removeAlbumFromFavs(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.favsService.removeAlbumFromFavs(uuid);
   }
 }

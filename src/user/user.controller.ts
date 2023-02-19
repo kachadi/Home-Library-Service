@@ -21,8 +21,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -33,22 +33,22 @@ export class UserController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    return await this.userService.create(createUserDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':uuid')
-  update(
+  async update(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.userService.update(uuid, updateUserDto);
+    return await this.userService.update(uuid, updateUserDto);
   }
 
   @Delete(':uuid')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.userService.remove(uuid);
+  async remove(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return await this.userService.remove(uuid);
   }
 }

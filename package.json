@@ -7,7 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "docker": "docker-compose up",
-    "docker:test": "docker exec home-library-service-app-container npm run test",
+    "docker:test": "docker exec app-container npm run test",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
