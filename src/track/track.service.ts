@@ -1,22 +1,20 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { FavsService } from 'src/favs/favs.service';
 import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
-import {
-  isItemExists,
-  isItemUUIDAndExists,
-  removeItemFromFavs,
-} from 'src/utils/helpers';
+import { isItemExists, isItemIdUUID } from 'src/utils/helpers';
+import { Repository } from 'typeorm';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import TrackEntity from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  tracks: TrackEntity[] = [];
-
   constructor(
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
     @Inject(forwardRef(() => ArtistService))
     private artistService: ArtistService,
     @Inject(forwardRef(() => AlbumService))
@@ -25,91 +23,85 @@ export class TrackService {
     private favsService: FavsService,
   ) {}
 
-  findAll() {
-    return this.tracks;
+  async findAll() {
+    return await this.trackRepository.find();
   }
 
-  findOne(id: string) {
-    isItemExists(this.tracks, id, ResoursesNames.TRACK);
-    const track = this.tracks.find((track) => track.id === id);
+  async findOne(trackId: string) {
+    await isItemExists(this.trackRepository, trackId, ResoursesNames.TRACK);
+    const track = await this.trackRepository.findOne({
+      where: { id: trackId },
+    });
     return track;
   }
 
-  create(createTrackDto: CreateTrackDto) {
-    const newTrack = new TrackEntity(createTrackDto);
+  async create(createTrackDto: CreateTrackDto) {
+    const createdTrack = this.trackRepository.create(createTrackDto);
 
-    if (newTrack.albumId !== null) {
-      isItemUUIDAndExists(
-        this.albumService.albums,
-        newTrack.albumId,
-        ResoursesIdKeys.ALBUM_ID,
-      );
+    if (createdTrack.albumId !== null) {
+      await this.albumService.checkAlbumExists(createdTrack.albumId);
     }
-    if (newTrack.artistId !== null) {
-      isItemUUIDAndExists(
-        this.artistService.artists,
-        newTrack.artistId,
-        ResoursesIdKeys.ARTIST_ID,
-      );
+    if (createdTrack.artistId !== null) {
+      await this.artistService.checkArtistExists(createdTrack.artistId);
     }
 
-    this.tracks.push(newTrack);
+    const newTrack = await this.trackRepository.save(createdTrack);
+
     return newTrack;
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto) {
-    isItemExists(this.tracks, id, ResoursesNames.TRACK);
+  async update(trackId: string, updateTrackDto: UpdateTrackDto) {
+    await isItemExists(this.trackRepository, trackId, ResoursesNames.TRACK);
 
-    const existingTrack = this.tracks.find((track) => track.id === id);
+    const track = await this.trackRepository.findOne({
+      where: { id: trackId },
+    });
 
-    for (const key in existingTrack) {
+    for (const key in track) {
       if (updateTrackDto[key]) {
         if (key === ResoursesIdKeys.ARTIST_ID) {
           const artistId = updateTrackDto[key];
-
-          isItemUUIDAndExists(
-            this.artistService.artists,
-            artistId,
-            ResoursesIdKeys.ARTIST_ID,
-          );
+          isItemIdUUID(artistId);
+          await this.artistService.checkArtistExists(artistId);
         } else if (key === ResoursesIdKeys.ALBUM_ID) {
           const albumId = updateTrackDto[key];
-
-          isItemUUIDAndExists(
-            this.albumService.albums,
-            albumId,
-            ResoursesIdKeys.ALBUM_ID,
-          );
+          isItemIdUUID(albumId);
+          await this.albumService.checkAlbumExists(albumId);
         }
 
-        existingTrack[key] = updateTrackDto[key];
+        track[key] = updateTrackDto[key];
       }
     }
-    return existingTrack;
+
+    const updatedTrack = await this.trackRepository.save(track);
+
+    return updatedTrack;
   }
 
-  remove(id: string) {
-    const existingTrackId = this.tracks.findIndex((track) => track.id === id);
-
-    isItemExists(this.tracks, id, ResoursesNames.TRACK);
-
-    this.tracks.splice(existingTrackId, 1);
-
-    removeItemFromFavs(
-      this.favsService.favs.tracks,
-      id,
-      ResoursesIdKeys.TRACK_ID,
-    );
+  async remove(trackId: string) {
+    await isItemExists(this.trackRepository, trackId, ResoursesNames.TRACK);
+    await this.trackRepository.delete(trackId);
   }
 
-  getTracksById(tracksIdsArray: string[]) {
+  async getTracksById(tracksIdsArray: string[]) {
     const tracksArray = [];
 
-    tracksIdsArray.forEach((trackId) => {
-      const track = this.tracks.filter((track) => track.id === trackId)[0];
+    tracksIdsArray.forEach(async (trackId) => {
+      const track = await this.trackRepository.find({
+        where: { id: trackId },
+      })[0];
       tracksArray.push(track);
     });
 
     return tracksArray;
+  }
+
+  async checkTrackExists(trackId: string, isFavs = false) {
+    await isItemExists(
+      this.trackRepository,
+      trackId,
+      ResoursesNames.TRACK,
+      isFavs,
+    );
   }
 }

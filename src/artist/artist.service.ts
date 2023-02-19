@@ -1,22 +1,20 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AlbumService } from 'src/album/album.service';
 import { FavsService } from 'src/favs/favs.service';
 import { TrackService } from 'src/track/track.service';
-import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
-import {
-  isItemExists,
-  nullifyItemFromOtherCollections,
-  removeItemFromFavs,
-} from 'src/utils/helpers';
+import { ResoursesNames } from 'src/utils/constants';
+import { isItemExists } from 'src/utils/helpers';
+import { Repository } from 'typeorm';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import ArtistEntity from './entities/artist.entity';
 
 @Injectable()
 export class ArtistService {
-  artists: ArtistEntity[] = [];
-
   constructor(
+    @InjectRepository(ArtistEntity)
+    private artistRepository: Repository<ArtistEntity>,
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
     @Inject(forwardRef(() => AlbumService))
@@ -25,68 +23,71 @@ export class ArtistService {
     private favsService: FavsService,
   ) {}
 
-  findAll() {
-    return this.artists;
+  async findAll() {
+    return await this.artistRepository.find();
   }
 
-  findOne(id: string) {
-    isItemExists(this.artists, id, ResoursesNames.ARTIST);
-    const artist = this.artists.find((artist) => artist.id === id);
+  async findOne(artistId: string) {
+    await isItemExists(this.artistRepository, artistId, ResoursesNames.ARTIST);
+
+    const artist = await this.artistRepository.findOne({
+      where: { id: artistId },
+    });
+
     return artist;
   }
 
-  create(createArtistDto: CreateArtistDto) {
-    const newArtist = new ArtistEntity(createArtistDto);
-    this.artists.push(newArtist);
+  async create(createArtistDto: CreateArtistDto) {
+    const createdAlbum = this.artistRepository.create(createArtistDto);
+
+    const newArtist = await this.artistRepository.save(createdAlbum);
     return newArtist;
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto) {
-    isItemExists(this.artists, id, ResoursesNames.ARTIST);
+  async update(artistId: string, updateArtistDto: UpdateArtistDto) {
+    await isItemExists(this.artistRepository, artistId, ResoursesNames.ARTIST);
 
-    const existingArtist = this.artists.find((artist) => artist.id === id);
+    const artist = await this.artistRepository.findOne({
+      where: { id: artistId },
+    });
 
-    for (const key in existingArtist) {
+    for (const key in artist) {
       if (updateArtistDto.grammy === false) {
-        existingArtist.grammy = updateArtistDto.grammy;
+        artist.grammy = updateArtistDto.grammy;
       } else if (updateArtistDto[key]) {
-        existingArtist[key] = updateArtistDto[key];
+        artist[key] = updateArtistDto[key];
       }
     }
 
-    return existingArtist;
+    const updatedArtist = await this.artistRepository.save(artist);
+
+    return updatedArtist;
   }
 
-  remove(id: string) {
-    const existingArtistId = this.artists.findIndex(
-      (artist) => artist.id === id,
-    );
-
-    isItemExists(this.artists, id, ResoursesNames.ARTIST);
-
-    this.artists.splice(existingArtistId, 1);
-
-    nullifyItemFromOtherCollections(
-      [this.trackService.tracks, this.albumService.albums],
-      ResoursesIdKeys.ARTIST_ID,
-      id,
-    );
-
-    removeItemFromFavs(
-      this.favsService.favs.artists,
-      id,
-      ResoursesIdKeys.ARTIST_ID,
-    );
+  async remove(artistId: string) {
+    await isItemExists(this.artistRepository, artistId, ResoursesNames.ARTIST);
+    await this.artistRepository.delete(artistId);
   }
 
-  getArtistsById(artistIdsArray: string[]) {
+  async getArtistsById(artistIdsArray: string[]) {
     const artistsArray = [];
 
-    artistIdsArray.forEach((artistId) => {
-      const artist = this.artists.filter((artist) => artist.id === artistId)[0];
+    artistIdsArray.forEach(async (artistId) => {
+      const artist = await this.artistRepository.find({
+        where: { id: artistId },
+      })[0];
       artistsArray.push(artist);
     });
 
     return artistsArray;
+  }
+
+  async checkArtistExists(artistId: string, isFavs = false) {
+    await isItemExists(
+      this.artistRepository,
+      artistId,
+      ResoursesNames.ARTIST,
+      isFavs,
+    );
   }
 }

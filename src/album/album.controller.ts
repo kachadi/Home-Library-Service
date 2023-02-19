@@ -25,7 +25,7 @@ export class AlbumController {
 
   @Get(':uuid')
   async findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.albumService.findOne(uuid);
+    return await this.albumService.findOne(uuid);
   }
 
   @Post()
@@ -34,11 +34,11 @@ export class AlbumController {
   }
 
   @Put(':uuid')
-  update(
+  async update(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
-    return this.albumService.update(uuid, updateAlbumDto);
+    return await this.albumService.update(uuid, updateAlbumDto);
   }
 
   @Delete(':uuid')

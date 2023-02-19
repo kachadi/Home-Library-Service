@@ -22,7 +22,6 @@ export class UserController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {
-    // TODO:
     return this.userService.findAll();
   }
 

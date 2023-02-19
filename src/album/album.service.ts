@@ -1,23 +1,20 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ArtistService } from 'src/artist/artist.service';
 import { FavsService } from 'src/favs/favs.service';
 import { TrackService } from 'src/track/track.service';
 import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
-import {
-  isItemExists,
-  isItemUUIDAndExists,
-  nullifyItemFromOtherCollections,
-  removeItemFromFavs,
-} from 'src/utils/helpers';
+import { isItemExists, isItemIdUUID } from 'src/utils/helpers';
+import { Repository } from 'typeorm';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import AlbumEntity from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  albums: AlbumEntity[] = [];
-
   constructor(
+    @InjectRepository(AlbumEntity)
+    private albumRepository: Repository<AlbumEntity>,
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
     @Inject(forwardRef(() => ArtistService))
@@ -26,82 +23,74 @@ export class AlbumService {
     private favsService: FavsService,
   ) {}
 
-  findAll() {
-    return this.albums;
+  async findAll() {
+    return await this.albumRepository.find();
   }
 
-  findOne(id: string) {
-    isItemExists(this.albums, id, ResoursesNames.ALBUM);
-    const album = this.albums.find((album) => album.id === id);
+  async findOne(albumId: string) {
+    await isItemExists(this.albumRepository, albumId, ResoursesNames.ALBUM);
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+    });
     return album;
   }
 
-  create(createAlbumDto: CreateAlbumDto) {
-    const newAlbum = new AlbumEntity(createAlbumDto);
+  async create(createAlbumDto: CreateAlbumDto) {
+    const createdAlbum = this.albumRepository.create(createAlbumDto);
 
-    if (newAlbum.artistId !== null) {
-      isItemUUIDAndExists(
-        this.artistService.artists,
-        newAlbum.artistId,
-        ResoursesIdKeys.ARTIST_ID,
-      );
+    if (createdAlbum.artistId !== null) {
+      await this.artistService.checkArtistExists(createdAlbum.artistId);
     }
-
-    this.albums.push(newAlbum);
+    const newAlbum = await this.albumRepository.save(createdAlbum);
     return newAlbum;
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto) {
-    isItemExists(this.albums, id, ResoursesNames.ALBUM);
+  async update(albumId: string, updateAlbumDto: UpdateAlbumDto) {
+    await isItemExists(this.albumRepository, albumId, ResoursesNames.ALBUM);
+    const album = await this.albumRepository.findOne({
+      where: { id: albumId },
+    });
 
-    const existingAlbum = this.albums.find((album) => album.id === id);
-
-    for (const key in existingAlbum) {
+    for (const key in album) {
       if (updateAlbumDto[key]) {
         if (key === ResoursesIdKeys.ARTIST_ID) {
           const artistId = updateAlbumDto[key];
-
-          isItemUUIDAndExists(
-            this.artistService.artists,
-            artistId,
-            ResoursesIdKeys.ARTIST_ID,
-          );
+          isItemIdUUID(artistId);
+          await this.artistService.checkArtistExists(artistId);
         }
-        existingAlbum[key] = updateAlbumDto[key];
+        album[key] = updateAlbumDto[key];
       }
     }
 
-    return existingAlbum;
+    const updatedAlbum = await this.albumRepository.save(album);
+
+    return updatedAlbum;
   }
 
-  remove(id: string) {
-    const existingAlbumId = this.albums.findIndex((album) => album.id === id);
-
-    isItemExists(this.albums, id, ResoursesNames.ALBUM);
-
-    this.albums.splice(existingAlbumId, 1);
-
-    nullifyItemFromOtherCollections(
-      [this.trackService.tracks],
-      ResoursesIdKeys.ALBUM_ID,
-      id,
-    );
-
-    removeItemFromFavs(
-      this.favsService.favs.albums,
-      id,
-      ResoursesIdKeys.ALBUM_ID,
-    );
+  async remove(albumId: string) {
+    await isItemExists(this.albumRepository, albumId, ResoursesNames.ALBUM);
+    await this.albumRepository.delete(albumId);
   }
 
-  getAlbumsById(albumsIdsArray: string[]) {
+  async getAlbumsById(albumsIdsArray: string[]) {
     const albumsArray = [];
 
-    albumsIdsArray.forEach((albumId) => {
-      const album = this.albums.filter((album) => album.id === albumId)[0];
+    albumsIdsArray.forEach(async (albumId) => {
+      const album = await this.albumRepository.find({
+        where: { id: albumId },
+      })[0];
       albumsArray.push(album);
     });
 
     return albumsArray;
+  }
+
+  async checkAlbumExists(albumId: string, isFavs = false) {
+    await isItemExists(
+      this.albumRepository,
+      albumId,
+      ResoursesNames.ALBUM,
+      isFavs,
+    );
   }
 }
