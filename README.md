@@ -38,12 +38,14 @@ Application start on `http://localhost:4000` by default. You can change port in 
 npm run docker
 ```
   
-3. To run tests
+3. To run tests  
+After build images with command 'npm run docker' you can run the tests using the command:  
 
 ```
 npm run docker:test
 ```
-4. Vulnerability scanning for images:
+4. Vulnerability scanning for images:  
+After build images with command 'npm run docker' you can perform vulnerability scanning and ran following commands:
   * for app image:
 
     ```
