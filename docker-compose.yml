@@ -1,11 +1,10 @@
-version: '3.6'
+version: '3.8'
 
 services:
-  db:
-    container_name: postgres-container
-    image: postgres
-    build: ./database
+  postgres:
+    container_name: database-container
     restart: always
+    build: ./database
     ports:
       - '${TYPEORM_PORT}:${TYPEORM_PORT}'
     environment:
@@ -13,20 +12,18 @@ services:
       - POSTGRES_PASSWORD=${TYPEORM_PASSWORD}
       - POSTGRES_DB=${TYPEORM_DATABASE}
     networks:
-      - home-library-network
+      - custom_network
+    command:
+      ['postgres', '-c', 'logging_collector=true', '-c', 'log_statement=all']
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - postgres-logs:/var/log/postgresql
 
   app:
     container_name: app-container
-    image: app
-    build: .
-    depends_on:
-      - db
     restart: always
+    build: .
     ports:
-      - '${PORT}:${PORT}'
+      - ${PORT}:${PORT}
     environment:
       - PORT=${PORT}
       - HOST=${HOST}
@@ -35,16 +32,15 @@ services:
       - TYPEORM_PASSWORD=${TYPEORM_PASSWORD}
       - TYPEORM_DATABASE=${TYPEORM_DATABASE}
       - TYPEORM_PORT=${TYPEORM_PORT}
-      - TYPEORM_HOST=db
+      - TYPEORM_HOST=postgres
+    depends_on:
+      - postgres
     networks:
-      - home-library-network
+      - custom_network
     volumes:
-      - ./:/app
-  
+      - ./src:/app/src
 volumes:
   postgres-data:
-  postgres-logs:
 networks:
-    home-library-network:
-      driver: bridge
-
+  custom_network:
+    driver: bridge
