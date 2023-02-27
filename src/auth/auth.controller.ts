@@ -4,6 +4,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  NotImplementedException,
   Post,
   UseInterceptors,
 } from '@nestjs/common';
@@ -27,9 +28,8 @@ export class AuthController {
     return await this.authService.login(authUserCredentials);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post('refresh')
-  async refresh(@Body() authCredentials: CreateUserDto) {
-    // return await this.authService.refresh(authCredentials);
+  async refresh() {
+    throw new NotImplementedException();
   }
 }

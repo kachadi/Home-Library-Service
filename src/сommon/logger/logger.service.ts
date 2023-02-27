@@ -19,17 +19,20 @@ export class CustomLoggerService extends ConsoleLogger {
 
   async writeLogToFile(message: string, filePath: string, date: Date) {
     const fileName = `${date.toJSON()}.log`;
+    console.log(fileName);
     const lastLogFileName = await fs.promises
       .readdir(filePath)
       .then((filenames) => {
-        if (filenames.length === 0) {
-          return;
+        if (filenames.length <= 1) {
+          return false;
+        } else {
+          const filesArray = filenames
+            .slice(1, filenames.length)
+            .map((item) => Number(new Date(item.replace('.log', '')).getTime()))
+            .sort((a: number, b: number) => b - a);
+          const lastFile = `${new Date(filesArray[0]).toJSON()}.log`;
+          return lastFile;
         }
-        const filesArray = filenames
-          .map((item) => Number(new Date(item.replace('.log', '')).getTime()))
-          .sort((a: number, b: number) => b - a);
-        const lastFile = `${new Date(filesArray[0]).toJSON()}.log`;
-        return lastFile;
       });
 
     if (lastLogFileName) {
@@ -55,7 +58,7 @@ export class CustomLoggerService extends ConsoleLogger {
     let folder = 'app_logs';
     if (isError) folder = 'errors';
 
-    const filePath = `${logsPath}/${folder}/`;
+    const filePath = `${logsPath}/${folder}`;
     return filePath;
   }
 
