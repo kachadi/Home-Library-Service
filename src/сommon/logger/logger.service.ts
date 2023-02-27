@@ -19,7 +19,7 @@ export class CustomLoggerService extends ConsoleLogger {
 
   async writeLogToFile(message: string, filePath: string, date: Date) {
     const fileName = `${date.toJSON()}.log`;
-    console.log(fileName);
+
     const lastLogFileName = await fs.promises
       .readdir(filePath)
       .then((filenames) => {
