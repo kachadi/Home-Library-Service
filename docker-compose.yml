@@ -11,6 +11,8 @@ services:
       - POSTGRES_USER=${TYPEORM_USERNAME}
       - POSTGRES_PASSWORD=${TYPEORM_PASSWORD}
       - POSTGRES_DB=${TYPEORM_DATABASE}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - MAX_LOG_FILE_SIZE_KB=${MAX_LOG_FILE_SIZE_KB}
     networks:
       - custom_network
     command:
@@ -33,6 +35,8 @@ services:
       - TYPEORM_DATABASE=${TYPEORM_DATABASE}
       - TYPEORM_PORT=${TYPEORM_PORT}
       - TYPEORM_HOST=postgres
+      - LOG_LEVEL=${LOG_LEVEL}
+      - MAX_LOG_FILE_SIZE_KB=${MAX_LOG_FILE_SIZE_KB}
     depends_on:
       - postgres
     networks:
