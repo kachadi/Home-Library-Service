@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResoursesNames } from 'src/utils/constants';
 import { isItemExists } from 'src/utils/helpers';
@@ -30,14 +26,7 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const createdUser = this.userRepository.create(createUserDto);
-    const newUser = await this.userRepository.save(createdUser).catch((err) => {
-      if (err.code === '23505') {
-        throw new ConflictException('Login is already exists.');
-      }
-      // else {
-      //   throw new InternalServerErrorException();
-      // }
-    });
+    const newUser = await this.userRepository.save(createdUser);
     return newUser;
   }
 

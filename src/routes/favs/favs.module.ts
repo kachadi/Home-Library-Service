@@ -1,6 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 import { AlbumModule } from 'src/routes/album/album.module';
 import { ArtistModule } from 'src/routes/artist/artist.module';
 import { TrackModule } from 'src/routes/track/track.module';

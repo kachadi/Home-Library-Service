@@ -8,7 +8,7 @@ import {
   Post,
   UseInterceptors,
 } from '@nestjs/common';
-import { CreateUserDto } from '../routes/user/dto/create-user.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 
 @Controller('auth')

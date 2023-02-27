@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from 'src/auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 import { ArtistModule } from 'src/routes/artist/artist.module';
 import ArtistEntity from 'src/routes/artist/entities/artist.entity';
 import { FavsModule } from 'src/routes/favs/favs.module';

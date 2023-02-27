@@ -5,7 +5,7 @@ import { AlbumModule } from 'src/routes/album/album.module';
 import { ArtistModule } from 'src/routes/artist/artist.module';
 import { FavsModule } from 'src/routes/favs/favs.module';
 import { TrackModule } from 'src/routes/track/track.module';
-import { UserModule } from '../routes/user/user.module';
+import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
