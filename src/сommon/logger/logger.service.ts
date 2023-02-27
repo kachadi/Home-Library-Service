@@ -1,7 +1,7 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 
-const logsPath = `src/logs`;
+const logsPath = `src/application_logs`;
 const maxLogFileSize = Number(process.env.MAX_LOG_FILE_SIZE_KB) * 1024;
 
 @Injectable()
