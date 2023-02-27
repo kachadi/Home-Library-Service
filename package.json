@@ -8,6 +8,7 @@
   "scripts": {
     "docker": "docker-compose up",
     "docker:test": "docker exec app-container npm run test",
+    "docker:test:auth": "docker exec app-container npm run test:auth -- --runInBand",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -16,7 +16,12 @@ export class AuthService {
     const { login, password } = createUserDto;
     const hashedPassword = await this.createHashedPassword(password);
 
-    await this.userService.create({ login, password: hashedPassword });
+    const user = await this.userService.create({
+      login,
+      password: hashedPassword,
+    });
+
+    return user;
   }
 
   async login(authUserCredentialDto: CreateUserDto) {

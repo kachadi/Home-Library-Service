@@ -6,19 +6,17 @@ import {
   shouldAuthorizationBeTested,
   removeTokenUser,
 } from './utils';
-import { tracksRoutes } from './endpoints';
+import { usersRoutes } from './endpoints';
 
-const createTrackDto = {
-  name: 'TEST_TRACK',
-  duration: 199,
-  artistId: null,
-  albumId: null,
+const createUserDto = {
+  login: 'TEST_LOGIN',
+  password: 'TEST_PASSWORD',
 };
 
 // Probability of collisions for UUID is almost zero
 const randomUUID = '0a35dd62-e09f-444b-a628-f4e7c6954f57';
 
-describe('Tracks (e2e)', () => {
+describe('Users (e2e)', () => {
   const unauthorizedRequest = request;
   const commonHeaders = { Accept: 'application/json' };
   let mockUserId: string | undefined;
@@ -43,34 +41,33 @@ describe('Tracks (e2e)', () => {
   });
 
   describe('GET', () => {
-    it('should correctly get all tracks', async () => {
+    it('should correctly get all users', async () => {
       const response = await unauthorizedRequest
-        .get(tracksRoutes.getAll)
+        .get(usersRoutes.getAll)
         .set(commonHeaders);
-
       expect(response.status).toBe(StatusCodes.OK);
       expect(response.body).toBeInstanceOf(Array);
     });
 
-    it('should correctly get track by id', async () => {
+    it('should correctly get user by id', async () => {
       const creationResponse = await unauthorizedRequest
-        .post(tracksRoutes.create)
+        .post(usersRoutes.create)
         .set(commonHeaders)
-        .send(createTrackDto);
+        .send(createUserDto);
 
       const { id } = creationResponse.body;
 
       expect(creationResponse.statusCode).toBe(StatusCodes.CREATED);
 
       const searchResponse = await unauthorizedRequest
-        .get(tracksRoutes.getById(id))
+        .get(usersRoutes.getById(id))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.OK);
       expect(searchResponse.body).toBeInstanceOf(Object);
 
       const cleanupResponse = await unauthorizedRequest
-        .delete(tracksRoutes.delete(id))
+        .delete(usersRoutes.delete(id))
         .set(commonHeaders);
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
@@ -78,15 +75,15 @@ describe('Tracks (e2e)', () => {
 
     it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
       const response = await unauthorizedRequest
-        .get(tracksRoutes.getById('some-invalid-id'))
+        .get(usersRoutes.getById('some-invalid-id'))
         .set(commonHeaders);
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it("should respond with NOT_FOUND status code in case if track doesn't exist", async () => {
+    it("should respond with NOT_FOUND status code in case if user doesn't exist", async () => {
       const response = await unauthorizedRequest
-        .get(tracksRoutes.getById(randomUUID))
+        .get(usersRoutes.getById(randomUUID))
         .set(commonHeaders);
 
       expect(response.status).toBe(StatusCodes.NOT_FOUND);
@@ -94,23 +91,26 @@ describe('Tracks (e2e)', () => {
   });
 
   describe('POST', () => {
-    it('should correctly create track', async () => {
+    it('should correctly create user', async () => {
       const response = await unauthorizedRequest
-        .post(tracksRoutes.create)
+        .post(usersRoutes.create)
         .set(commonHeaders)
-        .send(createTrackDto);
+        .send(createUserDto);
+
+      const { id, version, login, createdAt, updatedAt } = response.body;
 
       expect(response.status).toBe(StatusCodes.CREATED);
 
-      const { id, name, duration, artistId, albumId } = response.body;
+      expect(login).toBe(createUserDto.login);
+      expect(response.body).not.toHaveProperty('password');
       expect(validate(id)).toBe(true);
-      expect(name).toBe(createTrackDto.name);
-      expect(duration).toBe(createTrackDto.duration);
-      expect(artistId).toBe(createTrackDto.artistId);
-      expect(albumId).toBe(createTrackDto.albumId);
+      expect(version).toBe(1);
+      expect(typeof createdAt).toBe('number');
+      expect(typeof updatedAt).toBe('number');
+      expect(createdAt === updatedAt).toBe(true);
 
       const cleanupResponse = await unauthorizedRequest
-        .delete(tracksRoutes.delete(id))
+        .delete(usersRoutes.delete(id))
         .set(commonHeaders);
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
@@ -119,69 +119,81 @@ describe('Tracks (e2e)', () => {
     it('should respond with BAD_REQUEST in case of invalid required data', async () => {
       const responses = await Promise.all([
         unauthorizedRequest
-          .post(tracksRoutes.create)
+          .post(usersRoutes.create)
           .set(commonHeaders)
           .send({}),
-        unauthorizedRequest.post(tracksRoutes.create).set(commonHeaders).send({
-          name: 'TEST_TRACK',
-        }),
-        unauthorizedRequest.post(tracksRoutes.create).set(commonHeaders).send({
-          duration: 99,
-        }),
-        unauthorizedRequest.post(tracksRoutes.create).set(commonHeaders).send({
-          name: null,
-          duration: '99',
-        }),
+        unauthorizedRequest
+          .post(usersRoutes.create)
+          .set(commonHeaders)
+          .send({ login: 'TEST_LOGIN' }),
+        unauthorizedRequest
+          .post(usersRoutes.create)
+          .set(commonHeaders)
+          .send({ password: 'TEST_PASSWORD' }),
+        unauthorizedRequest
+          .post(usersRoutes.create)
+          .set(commonHeaders)
+          .send({ login: null, password: 12345 }),
       ]);
 
       expect(
         responses.every(
           ({ statusCode }) => statusCode === StatusCodes.BAD_REQUEST,
         ),
-      );
+      ).toBe(true);
     });
   });
 
   describe('PUT', () => {
-    it('should correctly update track match', async () => {
+    it('should correctly update user password match', async () => {
       const creationResponse = await unauthorizedRequest
-        .post(tracksRoutes.create)
+        .post(usersRoutes.create)
         .set(commonHeaders)
-        .send(createTrackDto);
+        .send(createUserDto);
 
       const { id: createdId } = creationResponse.body;
 
       expect(creationResponse.status).toBe(StatusCodes.CREATED);
 
       const updateResponse = await unauthorizedRequest
-        .put(tracksRoutes.update(createdId))
+        .put(usersRoutes.update(createdId))
         .set(commonHeaders)
         .send({
-          name: createTrackDto.name,
-          duration: 188,
-          artistId: createTrackDto.artistId,
-          albumId: createTrackDto.albumId,
+          oldPassword: createUserDto.password,
+          newPassword: 'NEW_PASSWORD',
         });
 
       expect(updateResponse.statusCode).toBe(StatusCodes.OK);
 
       const {
         id: updatedId,
-        name,
-        duration,
-        artistId,
-        albumId,
+        version,
+        login,
+        createdAt,
+        updatedAt,
       } = updateResponse.body;
 
-      expect(name).toBe(createTrackDto.name);
-      expect(artistId).toBe(createTrackDto.artistId);
-      expect(albumId).toBe(createTrackDto.albumId);
-      expect(typeof duration).toBe('number');
+      expect(login).toBe(createUserDto.login);
+      expect(updateResponse.body).not.toHaveProperty('password');
       expect(validate(updatedId)).toBe(true);
       expect(createdId).toBe(updatedId);
+      expect(version).toBe(2);
+      expect(typeof createdAt).toBe('number');
+      expect(typeof updatedAt).toBe('number');
+      expect(createdAt === updatedAt).toBe(false);
+
+      const updateResponse2 = await unauthorizedRequest
+        .put(usersRoutes.update(createdId))
+        .set(commonHeaders)
+        .send({
+          oldPassword: createUserDto.password,
+          newPassword: 'NEW_PASSWORD',
+        });
+
+      expect(updateResponse2.statusCode).toBe(StatusCodes.FORBIDDEN);
 
       const cleanupResponse = await unauthorizedRequest
-        .delete(tracksRoutes.delete(createdId))
+        .delete(usersRoutes.delete(createdId))
         .set(commonHeaders);
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
@@ -189,50 +201,32 @@ describe('Tracks (e2e)', () => {
 
     it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
       const response = await unauthorizedRequest
-        .put(tracksRoutes.update('some-invalid-id'))
+        .put(usersRoutes.update('some-invalid-id'))
         .set(commonHeaders)
         .send({
-          name: createTrackDto.name,
-          duration: 188,
-          artistId: createTrackDto.artistId,
-          albumId: createTrackDto.albumId,
+          oldPassword: 'test',
+          newPassword: 'fake',
         });
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
     it('should respond with BAD_REQUEST status code in case of invalid dto', async () => {
-      const creationResponse = await unauthorizedRequest
-        .post(tracksRoutes.create)
-        .set(commonHeaders)
-        .send(createTrackDto);
-
-      const { id: createdId } = creationResponse.body;
-
-      expect(creationResponse.status).toBe(StatusCodes.CREATED);
-
       const response = await unauthorizedRequest
-        .put(tracksRoutes.update(createdId))
+        .put(usersRoutes.update(randomUUID))
         .set(commonHeaders)
-        .send({
-          name: null,
-          duration: '188',
-          artistId: 123,
-          albumId: 123,
-        });
+        .send({});
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it("should respond with NOT_FOUND status code in case if track doesn't exist", async () => {
+    it("should respond with NOT_FOUND status code in case if user doesn't exist", async () => {
       const response = await unauthorizedRequest
-        .put(tracksRoutes.update(randomUUID))
+        .put(usersRoutes.update(randomUUID))
         .set(commonHeaders)
         .send({
-          name: createTrackDto.name,
-          duration: 188,
-          artistId: createTrackDto.artistId,
-          albumId: createTrackDto.albumId,
+          oldPassword: 'test',
+          newPassword: 'fake',
         });
 
       expect(response.status).toBe(StatusCodes.NOT_FOUND);
@@ -240,24 +234,24 @@ describe('Tracks (e2e)', () => {
   });
 
   describe('DELETE', () => {
-    it('should correctly delete track', async () => {
+    it('should correctly delete user', async () => {
       const response = await unauthorizedRequest
-        .post(tracksRoutes.create)
+        .post(usersRoutes.create)
         .set(commonHeaders)
-        .send(createTrackDto);
+        .send(createUserDto);
 
       const { id } = response.body;
 
       expect(response.status).toBe(StatusCodes.CREATED);
 
       const cleanupResponse = await unauthorizedRequest
-        .delete(tracksRoutes.delete(id))
+        .delete(usersRoutes.delete(id))
         .set(commonHeaders);
 
       expect(cleanupResponse.statusCode).toBe(StatusCodes.NO_CONTENT);
 
       const searchResponse = await unauthorizedRequest
-        .get(tracksRoutes.getById(id))
+        .get(usersRoutes.getById(id))
         .set(commonHeaders);
 
       expect(searchResponse.statusCode).toBe(StatusCodes.NOT_FOUND);
@@ -265,15 +259,15 @@ describe('Tracks (e2e)', () => {
 
     it('should respond with BAD_REQUEST status code in case of invalid id', async () => {
       const response = await unauthorizedRequest
-        .delete(tracksRoutes.delete('some-invalid-id'))
+        .delete(usersRoutes.delete('some-invalid-id'))
         .set(commonHeaders);
 
       expect(response.status).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it("should respond with NOT_FOUND status code in case if track doesn't exist", async () => {
+    it("should respond with NOT_FOUND status code in case if user doesn't exist", async () => {
       const response = await unauthorizedRequest
-        .delete(tracksRoutes.delete(randomUUID))
+        .delete(usersRoutes.delete(randomUUID))
         .set(commonHeaders);
 
       expect(response.status).toBe(StatusCodes.NOT_FOUND);

@@ -9,11 +9,11 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/jwt.guard';
 import { FavsService } from './favs.service';
 
 @Controller('favs')
-@UseGuards(AuthGuard())
+@UseGuards(JwtGuard)
 export class FavsController {
   constructor(private readonly favsService: FavsService) {}
 

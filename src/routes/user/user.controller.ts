@@ -13,13 +13,13 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/jwt.guard';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('user')
-@UseGuards(AuthGuard())
+@UseGuards(JwtGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @UseInterceptors(ClassSerializerInterceptor)

@@ -11,13 +11,13 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { JwtGuard } from 'src/auth/jwt.guard';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
-@UseGuards(AuthGuard())
+@UseGuards(JwtGuard)
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
