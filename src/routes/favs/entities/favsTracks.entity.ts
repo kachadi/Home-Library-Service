@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import TrackEntity from 'src/track/entities/track.entity';
+import TrackEntity from 'src/routes/track/entities/track.entity';
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

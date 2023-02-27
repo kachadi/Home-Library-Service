@@ -4,16 +4,11 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
-  Inject,
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
-import { CustomLoggerService } from 'src/logger/logger.service';
 
 @Catch()
 export class CustomExceptionFilter implements ExceptionFilter {
-  @Inject()
-  private readonly logger: CustomLoggerService;
-
   constructor(private readonly httpAdapterHost: HttpAdapterHost) {}
 
   catch(exception: unknown, host: ArgumentsHost): void {

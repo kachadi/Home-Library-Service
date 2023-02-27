@@ -1,8 +1,8 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArtistService } from 'src/artist/artist.service';
-import { FavsService } from 'src/favs/favs.service';
-import { TrackService } from 'src/track/track.service';
+import { ArtistService } from 'src/routes/artist/artist.service';
+import { FavsService } from 'src/routes/favs/favs.service';
+import { TrackService } from 'src/routes/track/track.service';
 import { ResoursesIdKeys, ResoursesNames } from 'src/utils/constants';
 import { isItemExists, isItemIdUUID } from 'src/utils/helpers';
 import { Repository } from 'typeorm';

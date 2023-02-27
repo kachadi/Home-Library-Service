@@ -1,8 +1,8 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AlbumModule } from 'src/album/album.module';
-import { ArtistModule } from 'src/artist/artist.module';
-import { TrackModule } from 'src/track/track.module';
+import { AlbumModule } from 'src/routes/album/album.module';
+import { ArtistModule } from 'src/routes/artist/artist.module';
+import { TrackModule } from 'src/routes/track/track.module';
 import FavsAlbumsEntity from './entities/favsAlbums.entity';
 import FavsArtistsEntity from './entities/favsArtists.entity';
 import FavsTracksEntity from './entities/favsTracks.entity';

@@ -1,11 +1,11 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AlbumService } from 'src/album/album.service';
-import AlbumEntity from 'src/album/entities/album.entity';
-import { ArtistService } from 'src/artist/artist.service';
-import ArtistEntity from 'src/artist/entities/artist.entity';
-import TrackEntity from 'src/track/entities/track.entity';
-import { TrackService } from 'src/track/track.service';
+import { AlbumService } from 'src/routes/album/album.service';
+import AlbumEntity from 'src/routes/album/entities/album.entity';
+import { ArtistService } from 'src/routes/artist/artist.service';
+import ArtistEntity from 'src/routes/artist/entities/artist.entity';
+import TrackEntity from 'src/routes/track/entities/track.entity';
+import { TrackService } from 'src/routes/track/track.service';
 import { ResoursesNames } from 'src/utils/constants';
 import { successResponse } from 'src/utils/helpers';
 import { Repository } from 'typeorm';

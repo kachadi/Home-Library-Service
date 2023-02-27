@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 import * as yaml from 'js-yaml';
 import { join } from 'path';
 import { AppModule } from './app.module';
-import { CustomLoggerService } from './logger/logger.service';
+import { CustomLoggerService } from './сommon/logger/logger.service';
 
 dotenv.config();
 

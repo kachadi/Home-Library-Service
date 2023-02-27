@@ -1,18 +1,18 @@
 import { Exclude } from 'class-transformer';
-import AlbumEntity from 'src/album/entities/album.entity';
+import ArtistEntity from 'src/routes/artist/entities/artist.entity';
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export default class FavsAlbumsEntity {
+export default class FavsArtistsEntity {
   @PrimaryGeneratedColumn('uuid')
   @Exclude()
   id: string;
 
-  @OneToOne(() => AlbumEntity, {
+  @OneToOne(() => ArtistEntity, {
     cascade: true,
     onDelete: 'CASCADE',
     eager: true,
   })
   @JoinColumn()
-  album: AlbumEntity;
+  artist: ArtistEntity;
 }

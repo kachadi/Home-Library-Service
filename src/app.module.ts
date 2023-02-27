@@ -4,14 +4,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
-import { TrackModule } from './track/track.module';
-import { ArtistModule } from './artist/artist.module';
-import { AlbumModule } from './album/album.module';
-import { FavsModule } from './favs/favs.module';
-import { LoggerMiddleware } from './logger/logger.middleware';
-import { CustomLoggerService } from './logger/logger.service';
-import { CustomExceptionFilter } from './exception-filter/exeption.filter';
+import { UserModule } from './routes/user/user.module';
+import { TrackModule } from './routes/track/track.module';
+import { ArtistModule } from './routes/artist/artist.module';
+import { AlbumModule } from './routes/album/album.module';
+import { FavsModule } from './routes/favs/favs.module';
+import { CustomLoggerService } from './сommon/logger/logger.service';
+import { CustomExceptionFilter } from './сommon/exception-filter/exeption.filter';
+import { LoggerMiddleware } from './сommon/logger/logger.middleware';
 
 @Module({
   imports: [
