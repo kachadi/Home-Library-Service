@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ResoursesNames } from 'src/utils/constants';
 import { isItemExists } from 'src/utils/helpers';
@@ -26,7 +30,14 @@ export class UserService {
 
   async create(createUserDto: CreateUserDto) {
     const createdUser = this.userRepository.create(createUserDto);
-    const newUser = await this.userRepository.save(createdUser);
+    const newUser = await this.userRepository.save(createdUser).catch((err) => {
+      if (err.code === '23505') {
+        throw new ConflictException('Login is already exists.');
+      }
+      // else {
+      //   throw new InternalServerErrorException();
+      // }
+    });
     return newUser;
   }
 
@@ -48,5 +59,9 @@ export class UserService {
     if (user.password !== oldPassword) {
       throw new ForbiddenException(`Wrong old password`);
     }
+  }
+
+  async findOneByLogin(login: string) {
+    return await this.userRepository.findOne({ where: { login: login } });
   }
 }

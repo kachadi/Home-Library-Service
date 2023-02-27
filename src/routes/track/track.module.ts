@@ -6,6 +6,7 @@ import { AlbumModule } from 'src/routes/album/album.module';
 import { FavsModule } from 'src/routes/favs/favs.module';
 import TrackEntity from './entities/track.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     forwardRef(() => ArtistModule),
     forwardRef(() => AlbumModule),
     forwardRef(() => FavsModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [TrackController],
   providers: [TrackService],

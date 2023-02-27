@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from 'src/auth/auth.module';
 import { AlbumModule } from 'src/routes/album/album.module';
 import { ArtistModule } from 'src/routes/artist/artist.module';
 import { TrackModule } from 'src/routes/track/track.module';
@@ -19,6 +20,7 @@ import { FavsService } from './favs.service';
     forwardRef(() => ArtistModule),
     forwardRef(() => AlbumModule),
     forwardRef(() => TrackModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [FavsController],
   providers: [FavsService],

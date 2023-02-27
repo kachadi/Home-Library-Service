@@ -22,7 +22,9 @@ async function bootstrap() {
   });
   process.on('unhandledRejection', (reason, promise) => {
     const date = new Date();
-    const message = `${date.toLocaleString()}  |  Unhandled Rejection at: ${promise}; Reason: ${reason};`;
+    const message = `${date.toLocaleString()}  |  Unhandled Rejection at: ${JSON.stringify(
+      promise,
+    )}; Reason: ${reason};`;
     logger.warn(message, date);
   });
 

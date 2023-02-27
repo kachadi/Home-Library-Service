@@ -12,6 +12,7 @@ import { FavsModule } from './routes/favs/favs.module';
 import { CustomLoggerService } from './сommon/logger/logger.service';
 import { CustomExceptionFilter } from './сommon/exception-filter/exeption.filter';
 import { LoggerMiddleware } from './сommon/logger/logger.middleware';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { LoggerMiddleware } from './сommon/logger/logger.middleware';
         logging: true,
       }),
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

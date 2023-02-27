@@ -1,5 +1,6 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from 'src/auth/auth.module';
 import { AlbumModule } from 'src/routes/album/album.module';
 import { FavsModule } from 'src/routes/favs/favs.module';
 import { TrackModule } from 'src/routes/track/track.module';
@@ -13,6 +14,7 @@ import ArtistEntity from './entities/artist.entity';
     forwardRef(() => TrackModule),
     forwardRef(() => AlbumModule),
     forwardRef(() => FavsModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [ArtistController],
   providers: [ArtistService],
