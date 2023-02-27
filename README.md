@@ -167,7 +167,7 @@ Implemented endpoindpoints:
   
   * `DELETE /favs/artist/:id` - delete artist from favorites
 
-`/auth` route - to operate with `Favorites`:
+`/auth` route - to operate with authentication and authorization:
   
   * `POST auth/signup` - send login and password to create a new user
   
