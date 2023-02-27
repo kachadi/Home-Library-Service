@@ -12,7 +12,10 @@ Repository for Home Library Service task at NodeJS course 2022 Q4 at Rolling Sco
 ```
 git clone https://github.com/kachadi/Home-Library-Service.git
 ```
-
+### Changing branch
+```
+git checkout auth
+```
 ### Installing NPM modules
 
 ```
@@ -21,12 +24,6 @@ npm install
 
 ### Before starting app
 Rename `example.env` file in the root of the project to `.env`
-
-### Running application
-
-```
-npm start
-```
 
 Application start on `http://localhost:4000` by default. You can change port in .env file.
 
@@ -38,10 +35,10 @@ Application start on `http://localhost:4000` by default. You can change port in 
 npm run docker
 ```
   
-3. To run tests
+3. To run tests(in auth mode)
 
 ```
-npm run docker:test
+npm run docker:test:auth
 ```
 4. Vulnerability scanning for images:
   * for app image:
@@ -54,7 +51,12 @@ npm run docker:test
     ```
     npm run scan:postgres
     ```    
-    
+ 
+### Running application
+
+```
+npm start
+``` 
 ### Working with the application
 
 You can work with the application:  
@@ -165,26 +167,21 @@ Implemented endpoindpoints:
   
   * `DELETE /favs/artist/:id` - delete artist from favorites
 
+`/auth` route - to operate with `Favorites`:
+  
+  * `POST auth/signup` - send login and password to create a new user
+  
+  * `POST auth/login` - send login and password to get Access token(type: Bearer token)
+
 ## Testing
 
 After application running open new terminal and enter:
 
-To run all tests without authorization
-
-```
-npm run test
-```
-
-To run only one of all test suites
-
-```
-npm run test -- <path to suite>
-```
 
 To run all test with authorization
 
 ```
-npm run test:auth
+npm run test:auth -- --runInBand
 ```
 
 To run only specific test suite with authorization
